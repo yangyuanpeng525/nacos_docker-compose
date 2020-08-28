@@ -1,0 +1,47 @@
+version: "3.5"
+#http://ip:8848/nacos
+#默认：nacos/nacos
+services:
+  nacos:
+    image: registry.cn-hangzhou.aliyuncs.com/yangyuanpeng/nacos:nacos-server-1.1.4
+    container_name: nacos-standalone-mysql
+    environment:
+      TZ: "Asia/Shanghai"
+      PREFER_HOST_MODE: hostname
+      MODE: standalone
+      SPRING_DATASOURCE_PLATFORM: mysql
+      MYSQL_SERVICE_HOST: mysql
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: admin123
+    volumes:
+      - ./nacos-logs/:/home/nacos/logs
+    ports:
+      - "8848:8848"
+      - "9555:9555"
+    depends_on:
+      - mysql
+    restart: on-failure
+    healthcheck:
+          test: ["CMD","curl", "-I","-X","GET","127.0.0.1:8848/nacos/v1/ns/operator/servers"]
+          interval: 10s
+          timeout: 10s
+          retries: 3
+          start_period: 10s
+  mysql:
+    container_name: mysql
+    image: registry.cn-hangzhou.aliyuncs.com/yangyuanpeng/nacos:nacos-mysql-5.7.26
+    environment:
+      TZ: "Asia/Shanghai"
+      MYSQL_ROOT_PASSWORD : "admin123" #mysql root密码
+      MYSQL_DATABASE: nacos_config
+      MYSQL_USER: nacos
+      MYSQL_PASSWORD: admin123
+#    env_file:
+#      - ../env/mysql.env
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    restart: on-failure
