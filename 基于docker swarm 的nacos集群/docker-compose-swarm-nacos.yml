@@ -1,0 +1,79 @@
+#node.id为docker swarm 节点id
+version: "3.5"
+services:
+  nacos1:
+    hostname: nacos1
+    container_name: nacos1
+    image: registry.cn-hangzhou.aliyuncs.com/yangyuanpeng/nacos:nacos-server-1.1.4
+    volumes:
+      - ./nacos_logs:/home/nacos/logs
+    ports:
+      - "8848:8848"
+      - "9555:9555"
+    environment:
+      PREFER_HOST_MODE: hostname
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      MYSQL_SERVICE_HOST: 192.168.200.42  #修改成实际的数据库ip
+      MYSQL_SERVICE_DB_NAME: nacos_config  #修改成实际的dbname
+      MYSQL_SERVICE_PORT: 3306          #修改成对应的端口
+      MYSQL_SERVICE_USER: nacos     #修改成对应的用户名
+      MYSQL_SERVICE_PASSWORD: admin123     #修改成对应的密码
+    restart: always
+    networks:
+      - nacos_net
+    deploy:
+      placement:
+        constraints:
+          - node.id == wn7xx65qbpoet1dp8s0rzt5qr  #根据实际情况修改
+  
+  nacos2:
+    hostname: nacos2
+    image: registry.cn-hangzhou.aliyuncs.com/yangyuanpeng/nacos:nacos-server-1.1.4
+    container_name: nacos2
+    volumes:
+      - ./nacos_logs:/home/nacos/logs
+    ports:
+      - "8849:8848"
+    environment:
+      PREFER_HOST_MODE: hostname
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      MYSQL_SERVICE_HOST: 192.168.200.42
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: admin123
+    restart: always
+    networks:
+    networks:
+      - nacos_net
+    deploy:
+      placement:
+        constraints:
+          - node.id == jgp0er5hldg94u3mqxydeoqbq     #根据实际情况修改
+  nacos3:
+    hostname: nacos3
+    image: registry.cn-hangzhou.aliyuncs.com/yangyuanpeng/nacos:nacos-server-1.1.4
+    container_name: nacos3
+    volumes:
+      - ./nacos_logs:/home/nacos/logs
+    ports:
+      - "8850:8848"
+    environment:
+      PREFER_HOST_MODE: hostname
+      NACOS_SERVERS: nacos1:8848 nacos2:8848 nacos3:8848
+      MYSQL_SERVICE_HOST: 192.168.200.42
+      MYSQL_SERVICE_DB_NAME: nacos_config
+      MYSQL_SERVICE_PORT: 3306
+      MYSQL_SERVICE_USER: nacos
+      MYSQL_SERVICE_PASSWORD: admin123
+    restart: always
+    networks:
+    networks:
+      - nacos_net
+    deploy:
+      placement:
+        constraints:
+          - node.id == dqeyifgbcwxv8vgflgox47bo4      #根据实际情况修改
+networks:
+  nacos_net:
+    external: true
